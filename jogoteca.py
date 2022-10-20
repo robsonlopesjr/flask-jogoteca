@@ -16,6 +16,19 @@ jogo3 = Jogo('Mortal Kombat', 'Luta', 'PS2')
 lista = [jogo1, jogo2, jogo3]
 
 
+class Usuario:
+    def __init__(self, nome, nickname, senha):
+        self.nome = nome
+        self.nickname = nickname
+        self.senha = senha
+
+
+usuario1 = Usuario('Robson', 'robson', '123')
+usuario2 = Usuario('Teste', 'teste', '123')
+
+usuarios = {usuario1.nickname: usuario1, usuario2.nickname: usuario2}
+
+
 app = Flask(__name__)
 app.secret_key = 'teste'
 
@@ -55,13 +68,19 @@ def login():
 
 @app.route('/autenticar', methods=['POST', ])
 def autenticar():
-    if '123' == request.form['senha']:
-        session['usuario_logado'] = request.form['usuario']
-        flash(session['usuario_logado'] + ' logado com sucesso')
-        proxima_pagina = request.form['proxima']
-        return redirect(proxima_pagina)
+    if request.form['usuario'] in usuarios:
+        usuario = usuarios[request.form['usuario']]
+
+        if request.form['senha'] == usuario.senha:
+            session['usuario_logado'] = usuario.nickname
+            flash(usuario.nickname + ' logado com sucesso')
+            proxima_pagina = request.form['proxima']
+            return redirect(proxima_pagina)
+        else:
+            flash('Erro ao realizado o login')
+            return redirect(url_for('login'))
     else:
-        flash('Erro ao realizado o login')
+        flash('Usuario/senha não encontrado')
         return redirect(url_for('login'))
 
 
