@@ -1,4 +1,5 @@
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import (Flask, flash, redirect, render_template, request, session,
+                   url_for)
 
 
 class Jogo:
@@ -28,7 +29,7 @@ def index():
 def novo():
     if 'usuario_logado' not in session or session['usuario_logado'] is None:
         flash('Necessário estar logado')
-        return redirect('/login?proxima=novo')
+        return redirect(url_for('login', proxima=url_for('novo')))
 
     return render_template('novo.html', titulo='Novo Jogo')
 
@@ -43,7 +44,7 @@ def criar():
 
     lista.append(jogo)
 
-    return redirect('/')
+    return redirect(url_for('index'))
 
 
 @app.route('/login')
@@ -58,17 +59,17 @@ def autenticar():
         session['usuario_logado'] = request.form['usuario']
         flash(session['usuario_logado'] + ' logado com sucesso')
         proxima_pagina = request.form['proxima']
-        return redirect('/{}'.format(proxima_pagina))
+        return redirect(proxima_pagina)
     else:
         flash('Erro ao realizado o login')
-        return redirect('/login')
+        return redirect(url_for('login'))
 
 
 @app.route('/logout')
 def logout():
     session['usuario_logado'] = None
     flash('Logout efetuado com sucesso')
-    return redirect('/login')
+    return redirect(url_for('login'))
 
 
 app.run(debug=True)
